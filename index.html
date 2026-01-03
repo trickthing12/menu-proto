@@ -9,33 +9,25 @@
      * Stardew-like Warm UI Palette
      *******************************/
     :root{
-      /* Background */
-      --bg:#3b2a1d;                 /* 진한 우드 브라운 */
+      --bg:#3b2a1d;
       --bg2:#2c1f16;
 
-      /* Panels (wood/plank 느낌) */
-      --panel:#e7d2aa;              /* 밝은 베이지 */
-      --panel2:#d8bd8a;             /* 한 톤 진한 베이지 */
-      --panel3:#caa56f;             /* 우드 하이라이트 */
+      --panel:#e7d2aa;
+      --panel2:#d8bd8a;
+      --panel3:#caa56f;
 
-      /* Borders / lines */
       --line: rgba(66,44,26,.35);
       --line2: rgba(66,44,26,.55);
 
-      /* Text */
-      --text:#2a1c12;               /* 다크 브라운 텍스트 */
+      --text:#2a1c12;
       --muted:#5a3f2a;
 
-      /* Accent */
-      --accent:#2f8f4e;             /* 초록 포인트 */
+      --accent:#2f8f4e;
       --accent2:#1f6f3b;
 
-      /* Danger */
       --danger:#b23b3b;
 
-      /* Shadow */
       --shadow: 0 10px 22px rgba(0,0,0,.35);
-
       --radius:16px;
     }
 
@@ -208,6 +200,34 @@
       font-size:12px;
       line-height:1.3;
       margin:0;
+    }
+
+    /* "레시피" 버튼 (우측 상단) */
+    .recipe-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      border:2px solid rgba(66,44,26,.30);
+      background: rgba(255,255,255,.28);
+      padding:8px 12px;
+      font-weight:900;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: 0 3px 0 rgba(66,44,26,.16);
+      color: var(--text);
+      white-space:nowrap;
+    }
+    .recipe-btn:active{
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 rgba(66,44,26,.14);
+    }
+    .recipe-btn .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(47,143,78,.95);
+      border:1px solid rgba(31,111,59,.55);
+      box-shadow: 0 1px 0 rgba(255,255,255,.35) inset;
     }
 
     /* 좌측: 레시피 */
@@ -448,11 +468,11 @@
       color:var(--muted);
     }
 
-    /* 하단 버튼바 */
+    /* 하단 버튼바 (프리셋 버튼 제거: 2개로 변경) */
     .modal-footer{
       margin-top:12px;
       display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap:10px;
     }
     .btn-flat{
@@ -481,14 +501,13 @@
       box-shadow: 0 4px 0 rgba(178,59,59,.18);
     }
 
-    /* 드롭 가능 상태 표시 */
     .droppable{
       outline: 3px solid rgba(74,195,108,.45);
       outline-offset: 2px;
     }
 
     /***********************
-     * 프리셋(=미리보기) 팝업
+     * 미리보기(기존 프리셋 기능)
      ***********************/
     .preview-overlay{
       position:fixed;
@@ -575,7 +594,6 @@
     .layer.bun-top{ height:46px; border-radius: 24px 24px 16px 16px; }
     .layer.bun-bot{ height:42px; border-radius: 16px 16px 24px 24px; }
 
-    /* 레이어 외형(따뜻한 재료색) */
     .layer.meat{ background: rgba(178,59,59,.18); }
     .layer.veg{ background: rgba(47,143,78,.18); }
     .layer.spice{ background: rgba(160,110,60,.18); }
@@ -657,7 +675,6 @@
             <span class="chip" id="selectedBreadChip">빵: 밀 빵</span>
           </div>
 
-          <!-- 빵 선택 -->
           <div class="bread-row">
             <div class="dropdown" id="breadDropdown">
               <div class="bread-btn" id="breadBtn" role="button" tabindex="0" aria-label="빵 선택">
@@ -668,7 +685,6 @@
             </div>
           </div>
 
-          <!-- 레시피 재료 슬롯 -->
           <div class="recipe-box" id="recipeDropZone" aria-label="레시피 재료 칸 (드롭 가능)"></div>
 
           <p class="drop-hint">
@@ -677,11 +693,19 @@
           </p>
         </section>
 
-        <!-- 우측: 분류/재료 -->
+        <!-- 우측: 재료 (우측 상단에 레시피 버튼 배치) -->
         <section class="panel" aria-label="재료 목록">
           <div class="panel-header">
-            <h3 class="panel-title">재료</h3>
-            <p class="hint">보유 수량이 0개인 재료는 비활성 처리됩니다.</p>
+            <div>
+              <h3 class="panel-title">재료</h3>
+              <p class="hint">보유 수량이 0개인 재료는 비활성 처리됩니다.</p>
+            </div>
+
+            <!-- 레시피 버튼: 프리셋 기능(미리보기)으로 연결 -->
+            <button class="recipe-btn" id="btnRecipePreview" type="button" aria-label="레시피 미리보기">
+              <span class="dot" aria-hidden="true"></span>
+              레시피
+            </button>
           </div>
 
           <div class="tabs" id="tabs">
@@ -696,21 +720,20 @@
         </section>
       </div>
 
-      <!-- 하단 버튼 -->
+      <!-- 하단 버튼: 프리셋 제거 -->
       <div class="modal-footer" aria-label="하단 버튼">
         <button class="btn-flat primary" id="btnPlay">시작</button>
-        <button class="btn-flat" id="btnPreset">프리셋</button>
         <button class="btn-flat danger" id="btnExit">나가기</button>
       </div>
     </div>
   </div>
 
-  <!-- 프리셋(=햄버거 외형 미리보기) 팝업 -->
+  <!-- 미리보기(기존 프리셋 기능) 팝업 -->
   <div class="preview-overlay" id="previewOverlay" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
     <div class="preview-modal">
       <div class="preview-head">
         <div>
-          <div class="preview-title" id="previewTitle">프리셋 (햄버거 외형 미리보기)</div>
+          <div class="preview-title" id="previewTitle">레시피 미리보기 (햄버거 외형)</div>
           <p class="preview-sub">재료/빵을 변경하면 이 화면의 외형도 즉시 반영됩니다.</p>
         </div>
         <div class="chip" id="previewCountChip">0 / 10</div>
@@ -829,8 +852,10 @@
     const itemsGrid = document.getElementById('itemsGrid');
 
     const btnPlay = document.getElementById('btnPlay');
-    const btnPreset = document.getElementById('btnPreset');
     const btnExit = document.getElementById('btnExit');
+
+    // 새로 추가: 우측 상단 "레시피" 버튼(미리보기)
+    const btnRecipePreview = document.getElementById('btnRecipePreview');
 
     const previewOverlay = document.getElementById('previewOverlay');
     const btnPreviewExit = document.getElementById('btnPreviewExit');
@@ -1094,7 +1119,9 @@
       alert("가게 운영 시작!\n\n" + summary);
     });
 
-    btnPreset.addEventListener("click", () => openPreview());
+    // 변경 핵심: "레시피" 버튼 -> 미리보기 오픈
+    btnRecipePreview.addEventListener("click", () => openPreview());
+
     btnPreviewExit.addEventListener("click", () => closePreview());
     btnExit.addEventListener("click", () => closeOverlay());
 
@@ -1113,7 +1140,7 @@
 
     previewOverlay.addEventListener("click", (e) => {
       if (e.target === previewOverlay) {
-        // 바깥 클릭 닫기 비활성 (나가기 버튼으로만)
+        // 바깥 클릭 닫기 비활성(나가기 버튼으로만)
       }
     });
 
