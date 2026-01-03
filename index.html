@@ -5,28 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>가게 프로토타입</title>
   <style>
+    /*******************************
+     * Stardew-like Warm UI Palette
+     *******************************/
     :root{
-      --bg:#0b1220;
-      --panel:#0f1a2e;
-      --panel2:#101f36;
-      --btn:#1b2a46;
-      --btn2:#23385e;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --accent:#22c55e;
-      --danger:#ef4444;
-      --line:rgba(255,255,255,.12);
-      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      /* Background */
+      --bg:#3b2a1d;                 /* 진한 우드 브라운 */
+      --bg2:#2c1f16;
+
+      /* Panels (wood/plank 느낌) */
+      --panel:#e7d2aa;              /* 밝은 베이지 */
+      --panel2:#d8bd8a;             /* 한 톤 진한 베이지 */
+      --panel3:#caa56f;             /* 우드 하이라이트 */
+
+      /* Borders / lines */
+      --line: rgba(66,44,26,.35);
+      --line2: rgba(66,44,26,.55);
+
+      /* Text */
+      --text:#2a1c12;               /* 다크 브라운 텍스트 */
+      --muted:#5a3f2a;
+
+      /* Accent */
+      --accent:#2f8f4e;             /* 초록 포인트 */
+      --accent2:#1f6f3b;
+
+      /* Danger */
+      --danger:#b23b3b;
+
+      /* Shadow */
+      --shadow: 0 10px 22px rgba(0,0,0,.35);
+
       --radius:16px;
     }
-    *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif; }
+
+    *{
+      box-sizing:border-box;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    }
+
     body{
       margin:0;
       min-height:100vh;
-      background: radial-gradient(1200px 800px at 30% 20%, rgba(34,197,94,.18), transparent 55%),
-                  radial-gradient(1000px 700px at 70% 80%, rgba(59,130,246,.14), transparent 60%),
-                  var(--bg);
       color:var(--text);
+      background:
+        radial-gradient(900px 600px at 25% 15%, rgba(255,219,150,.18), transparent 60%),
+        radial-gradient(800px 500px at 70% 80%, rgba(255,236,195,.12), transparent 65%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
     }
 
     /* 홈 */
@@ -45,11 +70,10 @@
       justify-content:center;
       width:min(520px, 92vw);
       padding:28px;
-      background: rgba(15,26,46,.72);
-      border:1px solid var(--line);
-      border-radius: calc(var(--radius) + 6px);
+      background: linear-gradient(180deg, rgba(231,210,170,.96), rgba(216,189,138,.96));
+      border:1px solid var(--line2);
+      border-radius: calc(var(--radius) + 8px);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
     }
     .title{
       font-size:20px;
@@ -64,6 +88,8 @@
       line-height:1.4;
       text-align:center;
     }
+
+    /* 버튼 */
     .btn{
       width:100%;
       border:0;
@@ -72,24 +98,31 @@
       font-size:15px;
       font-weight:900;
       color:var(--text);
-      background: linear-gradient(180deg, var(--btn2), var(--btn));
-      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,243,220,.95), rgba(232,206,160,.95));
+      border:1px solid var(--line2);
       cursor:pointer;
       transition: transform .08s ease, filter .12s ease, opacity .12s ease;
       user-select:none;
+      box-shadow: 0 4px 0 rgba(66,44,26,.25);
     }
-    .btn:active{ transform: translateY(1px) scale(.995); }
+    .btn:active{
+      transform: translateY(1px);
+      box-shadow: 0 3px 0 rgba(66,44,26,.22);
+    }
     .btn-primary{
-      background: linear-gradient(180deg, rgba(34,197,94,.95), rgba(22,163,74,.9));
-      color:#05210f;
-      border: 1px solid rgba(5,150,105,.35);
+      background: linear-gradient(180deg, rgba(74,195,108,.95), rgba(47,143,78,.95));
+      border:1px solid rgba(31,111,59,.55);
+      color:#0e2416;
+      box-shadow: 0 4px 0 rgba(31,111,59,.28);
     }
     .btn-disabled{
-      opacity:.45;
-      filter:saturate(.7);
+      opacity:.55;
       cursor:not-allowed;
       pointer-events:none;
+      filter:saturate(.75);
+      box-shadow:none;
     }
+
     .bottom-left{
       position:absolute;
       left:24px;
@@ -119,7 +152,7 @@
       inset:0;
       display:none;
       place-items:center;
-      background: rgba(0,0,0,.55);
+      background: rgba(28,18,12,.58);
       padding:24px;
       z-index:50;
     }
@@ -127,12 +160,11 @@
 
     .modal{
       width:min(980px, 96vw);
-      background: rgba(15,26,46,.92);
-      border:1px solid var(--line);
-      border-radius: calc(var(--radius) + 10px);
+      background: linear-gradient(180deg, rgba(231,210,170,.98), rgba(216,189,138,.98));
+      border:2px solid rgba(66,44,26,.55);
+      border-radius: calc(var(--radius) + 12px);
       box-shadow: var(--shadow);
       padding:16px;
-      backdrop-filter: blur(10px);
       position:relative;
     }
 
@@ -148,14 +180,15 @@
     }
 
     .panel{
-      background: rgba(16,31,54,.9);
-      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,246,229,.96), rgba(232,206,160,.96));
+      border:2px solid rgba(66,44,26,.45);
       border-radius: 18px;
       padding:12px;
       display:flex;
       flex-direction:column;
       min-height:520px;
       min-width:0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
     .panel-header{
       display:flex;
@@ -192,18 +225,19 @@
       gap:10px;
       padding:12px 12px;
       border-radius:14px;
-      border:1px solid var(--line);
-      background: rgba(27,42,70,.65);
+      border:2px solid rgba(66,44,26,.45);
+      background: linear-gradient(180deg, rgba(255,243,220,.95), rgba(232,206,160,.95));
       cursor:pointer;
       user-select:none;
       font-weight:900;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
     }
     .chip{
       font-size:12px;
       padding:6px 10px;
       border-radius:999px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.06);
+      border:2px solid rgba(66,44,26,.35);
+      background: rgba(255,255,255,.35);
       color:var(--muted);
       white-space:nowrap;
     }
@@ -213,8 +247,8 @@
       position:absolute;
       left:0; right:0;
       top:calc(100% + 8px);
-      background: rgba(15,26,46,.98);
-      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,246,229,.98), rgba(232,206,160,.98));
+      border:2px solid rgba(66,44,26,.5);
       border-radius:14px;
       overflow:hidden;
       box-shadow: var(--shadow);
@@ -226,15 +260,15 @@
     .dropdown.open .dropdown-menu{ display:block; }
     .dd-item{
       padding:10px 12px;
-      border-bottom:1px solid rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(66,44,26,.18);
       cursor:pointer;
-      font-weight:800;
+      font-weight:900;
     }
     .dd-item:last-child{ border-bottom:0; }
-    .dd-item:hover{ background: rgba(255,255,255,.06); }
+    .dd-item:hover{ background: rgba(255,255,255,.35); }
 
     .recipe-box{
-      border:1px dashed rgba(255,255,255,.18);
+      border:2px dashed rgba(66,44,26,.35);
       border-radius:16px;
       padding:10px;
       flex:1;
@@ -243,6 +277,7 @@
       flex-direction:column;
       gap:8px;
       min-width:0;
+      background: rgba(255,255,255,.20);
     }
     .recipe-slot{
       display:flex;
@@ -251,8 +286,9 @@
       gap:10px;
       padding:10px 10px;
       border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
+      border:2px solid rgba(66,44,26,.25);
+      background: rgba(255,255,255,.35);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
     .slot-left{
       display:flex;
@@ -268,8 +304,9 @@
       place-items:center;
       font-size:12px;
       font-weight:900;
-      color:#062314;
-      background: rgba(34,197,94,.9);
+      color:#0e2416;
+      background: linear-gradient(180deg, rgba(74,195,108,.95), rgba(47,143,78,.95));
+      border:1px solid rgba(31,111,59,.55);
       flex:0 0 auto;
     }
     .slot-name{
@@ -291,19 +328,22 @@
       flex:0 0 auto;
     }
     .mini-btn{
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
+      border:2px solid rgba(66,44,26,.30);
+      background: rgba(255,255,255,.35);
       color:var(--text);
       border-radius:10px;
       padding:7px 10px;
       font-size:12px;
       font-weight:900;
       cursor:pointer;
+      box-shadow: 0 3px 0 rgba(66,44,26,.18);
     }
-    .mini-btn:active{ transform: translateY(1px); }
+    .mini-btn:active{ transform: translateY(1px); box-shadow: 0 2px 0 rgba(66,44,26,.16); }
     .mini-btn.danger{
-      border-color: rgba(239,68,68,.35);
-      background: rgba(239,68,68,.14);
+      border-color: rgba(178,59,59,.45);
+      background: rgba(178,59,59,.18);
+      color:#3a1414;
+      box-shadow: 0 3px 0 rgba(178,59,59,.18);
     }
     .drop-hint{
       margin-top:auto;
@@ -322,23 +362,26 @@
     .tab{
       padding:8px 12px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
+      border:2px solid rgba(66,44,26,.30);
+      background: rgba(255,255,255,.28);
       cursor:pointer;
       font-weight:900;
       font-size:13px;
       user-select:none;
+      box-shadow: 0 3px 0 rgba(66,44,26,.16);
     }
+    .tab:active{ transform: translateY(1px); box-shadow: 0 2px 0 rgba(66,44,26,.14); }
     .tab.active{
-      background: rgba(34,197,94,.18);
-      border-color: rgba(34,197,94,.35);
-      color: rgba(215,255,228,.95);
+      background: rgba(74,195,108,.22);
+      border-color: rgba(31,111,59,.45);
+      color:#0e2416;
+      box-shadow: 0 3px 0 rgba(31,111,59,.18);
     }
 
     .items{
-      border:1px solid rgba(255,255,255,.10);
+      border:2px solid rgba(66,44,26,.30);
       border-radius:16px;
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.18);
       overflow:hidden;
       display:flex;
       flex-direction:column;
@@ -356,8 +399,8 @@
       .items-scroll{ grid-template-columns: 1fr; }
     }
     .item{
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(27,42,70,.45);
+      border:2px solid rgba(66,44,26,.26);
+      background: rgba(255,255,255,.30);
       border-radius:14px;
       padding:10px;
       display:flex;
@@ -367,12 +410,13 @@
       cursor:grab;
       user-select:none;
       min-width:0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
     .item:active{ cursor:grabbing; }
     .item.disabled{
-      opacity:.40;
+      opacity:.55;
       cursor:not-allowed;
-      filter:saturate(.6);
+      filter:saturate(.75);
     }
     .item-left{
       min-width:0;
@@ -398,9 +442,10 @@
       font-weight:900;
       padding:6px 10px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
+      border:2px solid rgba(66,44,26,.26);
+      background: rgba(255,255,255,.25);
       flex:0 0 auto;
+      color:var(--muted);
     }
 
     /* 하단 버튼바 */
@@ -416,23 +461,29 @@
       padding:14px 16px;
       font-size:15px;
       font-weight:900;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
+      border:2px solid rgba(66,44,26,.35);
+      background: rgba(255,255,255,.28);
       color: var(--text);
       cursor:pointer;
+      box-shadow: 0 4px 0 rgba(66,44,26,.18);
     }
+    .btn-flat:active{ transform: translateY(1px); box-shadow: 0 3px 0 rgba(66,44,26,.16); }
     .btn-flat.primary{
-      background: rgba(34,197,94,.18);
-      border-color: rgba(34,197,94,.35);
+      background: rgba(74,195,108,.22);
+      border-color: rgba(31,111,59,.45);
+      color:#0e2416;
+      box-shadow: 0 4px 0 rgba(31,111,59,.18);
     }
     .btn-flat.danger{
-      background: rgba(239,68,68,.14);
-      border-color: rgba(239,68,68,.35);
+      background: rgba(178,59,59,.18);
+      border-color: rgba(178,59,59,.42);
+      color:#3a1414;
+      box-shadow: 0 4px 0 rgba(178,59,59,.18);
     }
 
     /* 드롭 가능 상태 표시 */
     .droppable{
-      outline: 2px solid rgba(34,197,94,.35);
+      outline: 3px solid rgba(74,195,108,.45);
       outline-offset: 2px;
     }
 
@@ -444,20 +495,19 @@
       inset:0;
       display:none;
       place-items:center;
-      background: rgba(0,0,0,.62);
+      background: rgba(28,18,12,.68);
       padding:24px;
-      z-index:80; /* 가게 운영 팝업 위 */
+      z-index:80;
     }
     .preview-overlay.is-open{ display:grid; }
 
     .preview-modal{
       width:min(720px, 96vw);
-      border-radius: calc(var(--radius) + 10px);
-      border:1px solid var(--line);
-      background: rgba(15,26,46,.95);
+      border-radius: calc(var(--radius) + 12px);
+      border:2px solid rgba(66,44,26,.55);
+      background: linear-gradient(180deg, rgba(231,210,170,.98), rgba(216,189,138,.98));
       box-shadow: var(--shadow);
       padding:16px;
-      backdrop-filter: blur(10px);
     }
     .preview-head{
       display:flex;
@@ -488,13 +538,14 @@
       .preview-grid{ grid-template-columns: 1fr; }
     }
     .burger-stage{
-      border:1px solid rgba(255,255,255,.12);
+      border:2px solid rgba(66,44,26,.30);
       border-radius:18px;
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.20);
       padding:14px;
       min-height:420px;
       display:grid;
       place-items:center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
     .burger{
       width:min(360px, 90%);
@@ -507,7 +558,7 @@
     .layer{
       height:34px;
       border-radius: 16px;
-      border:1px solid rgba(255,255,255,.12);
+      border:2px solid rgba(66,44,26,.20);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -519,29 +570,31 @@
       overflow:hidden;
       text-overflow:ellipsis;
       padding:0 10px;
+      background: rgba(255,255,255,.28);
     }
     .layer.bun-top{ height:46px; border-radius: 24px 24px 16px 16px; }
     .layer.bun-bot{ height:42px; border-radius: 16px 16px 24px 24px; }
 
-    /* 카테고리별 레이어 스타일(외형 느낌) */
-    .layer.meat{ background: rgba(244,63,94,.16); }
-    .layer.veg{ background: rgba(34,197,94,.16); }
-    .layer.spice{ background: rgba(168,85,247,.16); }
-    .layer.bread{ background: rgba(245,158,11,.16); }
+    /* 레이어 외형(따뜻한 재료색) */
+    .layer.meat{ background: rgba(178,59,59,.18); }
+    .layer.veg{ background: rgba(47,143,78,.18); }
+    .layer.spice{ background: rgba(160,110,60,.18); }
+    .layer.bread{ background: rgba(202,165,111,.35); }
 
     .preview-side{
-      border:1px solid rgba(255,255,255,.12);
+      border:2px solid rgba(66,44,26,.30);
       border-radius:18px;
-      background: rgba(255,255,255,.03);
+      background: rgba(255,255,255,.18);
       padding:12px;
       display:flex;
       flex-direction:column;
       gap:10px;
       min-height:420px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
     .meta-box{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(27,42,70,.35);
+      border:2px solid rgba(66,44,26,.20);
+      background: rgba(255,255,255,.25);
       border-radius:14px;
       padding:10px;
     }
@@ -549,7 +602,7 @@
       font-weight:900;
       font-size:12px;
       margin:0 0 6px 0;
-      color: rgba(255,255,255,.9);
+      color: rgba(42,28,18,.95);
     }
     .meta-text{
       margin:0;
@@ -616,9 +669,7 @@
           </div>
 
           <!-- 레시피 재료 슬롯 -->
-          <div class="recipe-box" id="recipeDropZone" aria-label="레시피 재료 칸 (드롭 가능)">
-            <!-- 렌더 -->
-          </div>
+          <div class="recipe-box" id="recipeDropZone" aria-label="레시피 재료 칸 (드롭 가능)"></div>
 
           <p class="drop-hint">
             • 우측 재료를 드래그하여 추가<br/>
@@ -693,20 +744,15 @@
   </div>
 
   <script>
-    /***********************
-     * 데이터(기획서 기반)
-     ***********************/
     const BREADS = ["밀 빵","브리오슈","치아바타","베이글","머핀"];
 
     const INGREDIENTS = [
-      // 고기
       { name:"콩고기", cat:"고기", infinite:true },
       { name:"돼지고기", cat:"고기" },
       { name:"소고기", cat:"고기" },
       { name:"닭고기", cat:"고기" },
       { name:"물고기", cat:"고기" },
 
-      // 채소
       { name:"토마토", cat:"채소" },
       { name:"양상추", cat:"채소" },
       { name:"감자", cat:"채소" },
@@ -721,7 +767,6 @@
       { name:"블루베리", cat:"채소" },
       { name:"호박", cat:"채소" },
 
-      // 향신료
       { name:"마늘", cat:"향신료" },
       { name:"고추", cat:"향신료" },
       { name:"깻잎", cat:"향신료" },
@@ -732,8 +777,6 @@
       { name:"캐모마일", cat:"향신료" },
     ];
 
-    // 보유 수량(프로토타입용 샘플) - 0이면 비활성
-    // 콩고기 무한(∞)
     const STOCK = {
       "콩고기": Infinity,
       "돼지고기": 3,
@@ -765,17 +808,11 @@
       "캐모마일": 0,
     };
 
-    /***********************
-     * 상태
-     ***********************/
     const MAX_RECIPE = 10;
     let selectedBread = "밀 빵";
     let currentTab = "고기";
-    let recipeItems = []; // [{name, cat}]
+    let recipeItems = [];
 
-    /***********************
-     * 엘리먼트
-     ***********************/
     const btnStart = document.getElementById('btnStart');
     const overlay = document.getElementById('opStartOverlay');
 
@@ -795,7 +832,6 @@
     const btnPreset = document.getElementById('btnPreset');
     const btnExit = document.getElementById('btnExit');
 
-    // 프리셋(미리보기) 팝업
     const previewOverlay = document.getElementById('previewOverlay');
     const btnPreviewExit = document.getElementById('btnPreviewExit');
     const burgerView = document.getElementById('burgerView');
@@ -803,9 +839,6 @@
     const previewItemsText = document.getElementById('previewItemsText');
     const previewCountChip = document.getElementById('previewCountChip');
 
-    /***********************
-     * 유틸
-     ***********************/
     function openOverlay(){
       overlay.classList.add('is-open');
       breadDropdown.classList.remove('open');
@@ -814,13 +847,13 @@
     function closeOverlay(){
       overlay.classList.remove('is-open');
       breadDropdown.classList.remove('open');
-      closePreview(); // 운영 팝업 닫힐 때 미리보기도 함께 닫기
+      closePreview();
       recipeDropZone.classList.remove('droppable');
     }
 
     function openPreview(){
       previewOverlay.classList.add('is-open');
-      renderPreview(); // 오픈 시 1회 렌더
+      renderPreview();
     }
     function closePreview(){
       previewOverlay.classList.remove('is-open');
@@ -833,7 +866,6 @@
       selectedBread = bread;
       selectedBreadChip.textContent = `빵: ${selectedBread}`;
       breadBtnValue.textContent = selectedBread;
-      // 미리보기 실시간 반영
       if (isPreviewOpen()) renderPreview();
     }
 
@@ -850,9 +882,6 @@
       recipeCountChip.textContent = `${recipeItems.length} / ${MAX_RECIPE}`;
     }
 
-    /***********************
-     * 렌더: 빵 드롭다운
-     ***********************/
     function renderBreadMenu(){
       breadMenu.innerHTML = "";
       BREADS.forEach(b => {
@@ -868,9 +897,6 @@
       });
     }
 
-    /***********************
-     * 렌더: 우측 재료 리스트
-     ***********************/
     function renderItems(){
       itemsGrid.innerHTML = "";
       const list = INGREDIENTS.filter(x => x.cat === currentTab);
@@ -919,9 +945,6 @@
       });
     }
 
-    /***********************
-     * 렌더: 좌측 레시피 슬롯
-     ***********************/
     function renderRecipe(){
       recipeDropZone.innerHTML = "";
 
@@ -980,9 +1003,6 @@
       updateRecipeCount();
     }
 
-    /***********************
-     * 드래그&드롭: 레시피 영역
-     ***********************/
     function wireDropZone(){
       recipeDropZone.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -1012,9 +1032,6 @@
       });
     }
 
-    /***********************
-     * 탭
-     ***********************/
     function wireTabs(){
       tabs.addEventListener("click", (e) => {
         const t = e.target.closest(".tab");
@@ -1027,11 +1044,6 @@
       });
     }
 
-    /***********************
-     * 프리셋(미리보기): 햄버거 외형 렌더
-     * - "이미지" 목적: 실제 이미지 파일 없이도 외형(스택 레이어)로 시각화
-     * - 나중에 실제 PNG 에셋으로 바꿀 때: 여기 렌더 함수만 교체하면 됨
-     ***********************/
     function catToClass(cat){
       if (cat === "고기") return "meat";
       if (cat === "채소") return "veg";
@@ -1040,7 +1052,6 @@
     }
 
     function renderPreview(){
-      // 우측 정보
       previewBreadText.textContent = (selectedBread === "밀 빵") ? `${selectedBread} (∞)` : selectedBread;
       previewCountChip.textContent = `${recipeItems.length} / ${MAX_RECIPE}`;
       previewItemsText.textContent =
@@ -1048,20 +1059,16 @@
           ? recipeItems.map((x,i)=>`${i+1}. ${x.name} (${x.cat})`).join("\n")
           : "재료 없음";
 
-      // 햄버거 레이어(위→아래)
       burgerView.innerHTML = "";
 
-      // 상단 빵
       const topBun = document.createElement("div");
       topBun.className = "layer bun-top bread";
       topBun.textContent = `${selectedBread} (상단)`;
       burgerView.appendChild(topBun);
 
-      // 재료 레이어
       if (recipeItems.length === 0){
         const empty = document.createElement("div");
         empty.className = "layer";
-        empty.style.background = "rgba(255,255,255,.04)";
         empty.textContent = "재료를 추가하면 외형이 쌓입니다";
         burgerView.appendChild(empty);
       } else {
@@ -1073,16 +1080,12 @@
         });
       }
 
-      // 하단 빵
       const botBun = document.createElement("div");
       botBun.className = "layer bun-bot bread";
       botBun.textContent = `${selectedBread} (하단)`;
       burgerView.appendChild(botBun);
     }
 
-    /***********************
-     * 버튼 동작
-     ***********************/
     btnPlay.addEventListener("click", () => {
       const summary =
         `빵: ${selectedBread}\n` +
@@ -1091,15 +1094,10 @@
       alert("가게 운영 시작!\n\n" + summary);
     });
 
-    // 프리셋 = 미리보기 팝업 오픈
     btnPreset.addEventListener("click", () => openPreview());
     btnPreviewExit.addEventListener("click", () => closePreview());
-
     btnExit.addEventListener("click", () => closeOverlay());
 
-    /***********************
-     * 빵 드롭다운
-     ***********************/
     breadBtn.addEventListener("click", () => {
       breadDropdown.classList.toggle("open");
     });
@@ -1107,34 +1105,25 @@
       if (!breadDropdown.contains(e.target)) breadDropdown.classList.remove("open");
     });
 
-    /***********************
-     * 홈: 가게 운영 시작만 상호작용
-     ***********************/
     btnStart.addEventListener('click', openOverlay);
 
-    // 오버레이 바깥 클릭 시 닫기
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeOverlay();
     });
 
-    // 미리보기 바깥 클릭은 닫지 않음(원하면 추가 가능)
     previewOverlay.addEventListener("click", (e) => {
       if (e.target === previewOverlay) {
-        // 바깥 클릭 닫기 비활성: 기획서에 '나가기 버튼' 명시
+        // 바깥 클릭 닫기 비활성 (나가기 버튼으로만)
       }
     });
 
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape"){
-        // ESC: 우선순위(미리보기 > 운영팝업)
         if (isPreviewOpen()) closePreview();
         else if (overlay.classList.contains("is-open")) closeOverlay();
       }
     });
 
-    /***********************
-     * 탭/렌더 초기화
-     ***********************/
     function setBreadInit(bread){
       selectedBread = bread;
       selectedBreadChip.textContent = `빵: ${selectedBread}`;
@@ -1155,9 +1144,6 @@
       renderAll();
     }
     init();
-
-    // 드래그로 재료 추가 후 실시간 반영을 위해 setBread에서 renderPreview 호출 포함
-    // 레시피 제거 버튼에서도 renderPreview 호출 포함
   </script>
 </body>
 </html>
