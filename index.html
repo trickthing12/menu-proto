@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>가게 프로토타입</title>
+  <title>가게 프로토타입 - 운영 모드</title>
   <style>
     /*******************************
      * Stardew-like Warm UI Palette
@@ -11,22 +11,16 @@
     :root{
       --bg:#3b2a1d;
       --bg2:#2c1f16;
-
       --panel:#e7d2aa;
       --panel2:#d8bd8a;
       --panel3:#caa56f;
-
       --line: rgba(66,44,26,.35);
       --line2: rgba(66,44,26,.55);
-
       --text:#2a1c12;
       --muted:#5a3f2a;
-
       --accent:#2f8f4e;
       --accent2:#1f6f3b;
-
       --danger:#b23b3b;
-
       --shadow: 0 10px 22px rgba(0,0,0,.35);
       --radius:16px;
     }
@@ -44,16 +38,21 @@
         radial-gradient(900px 600px at 25% 15%, rgba(255,219,150,.18), transparent 60%),
         radial-gradient(800px 500px at 70% 80%, rgba(255,236,195,.12), transparent 65%),
         linear-gradient(180deg, var(--bg), var(--bg2));
+      overflow: hidden; /* 스크롤 방지 */
     }
 
-    /* 홈 */
+    /* 공통 유틸 */
     .screen{
       min-height:100vh;
       display:grid;
       place-items:center;
       padding:24px;
       position:relative;
+      transition: opacity 0.3s ease;
     }
+    .hidden { display: none !important; }
+
+    /* 홈 화면 스타일 (기존 유지) */
     .center-actions{
       display:flex;
       flex-direction:column;
@@ -67,578 +66,272 @@
       border-radius: calc(var(--radius) + 8px);
       box-shadow: var(--shadow);
     }
-    .title{
-      font-size:20px;
-      font-weight:900;
-      letter-spacing:-0.02em;
-      margin:0 0 6px 0;
-    }
-    .subtitle{
-      margin:0 0 12px 0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.4;
-      text-align:center;
-    }
+    .title{ font-size:20px; font-weight:900; letter-spacing:-0.02em; margin:0 0 6px 0; }
+    .subtitle{ margin:0 0 12px 0; color:var(--muted); font-size:14px; line-height:1.4; text-align:center; }
 
-    /* 버튼 */
+    /* 버튼 스타일 (기존 유지) */
     .btn{
-      width:100%;
-      border:0;
-      border-radius:14px;
-      padding:14px 16px;
-      font-size:15px;
-      font-weight:900;
-      color:var(--text);
+      width:100%; border:0; border-radius:14px; padding:14px 16px;
+      font-size:15px; font-weight:900; color:var(--text);
       background: linear-gradient(180deg, rgba(255,243,220,.95), rgba(232,206,160,.95));
-      border:1px solid var(--line2);
-      cursor:pointer;
+      border:1px solid var(--line2); cursor:pointer;
       transition: transform .08s ease, filter .12s ease, opacity .12s ease;
-      user-select:none;
-      box-shadow: 0 4px 0 rgba(66,44,26,.25);
+      user-select:none; box-shadow: 0 4px 0 rgba(66,44,26,.25);
     }
-    .btn:active{
-      transform: translateY(1px);
-      box-shadow: 0 3px 0 rgba(66,44,26,.22);
-    }
+    .btn:active{ transform: translateY(1px); box-shadow: 0 3px 0 rgba(66,44,26,.22); }
     .btn-primary{
       background: linear-gradient(180deg, rgba(74,195,108,.95), rgba(47,143,78,.95));
-      border:1px solid rgba(31,111,59,.55);
-      color:#0e2416;
+      border:1px solid rgba(31,111,59,.55); color:#0e2416;
       box-shadow: 0 4px 0 rgba(31,111,59,.28);
     }
     .btn-disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      pointer-events:none;
-      filter:saturate(.75);
-      box-shadow:none;
+      opacity:.55; cursor:not-allowed; pointer-events:none;
+      filter:saturate(.75); box-shadow:none;
     }
-
-    .bottom-left{
-      position:absolute;
-      left:24px;
-      bottom:24px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      width:min(220px, 44vw);
-    }
-    .bottom-right{
-      position:absolute;
-      right:24px;
-      bottom:24px;
-      width:min(220px, 44vw);
-      display:flex;
-      justify-content:flex-end;
-    }
+    .bottom-left{ position:absolute; left:24px; bottom:24px; display:flex; flex-direction:column; gap:10px; width:min(220px, 44vw); }
+    .bottom-right{ position:absolute; right:24px; bottom:24px; width:min(220px, 44vw); display:flex; justify-content:flex-end; }
     @media (max-width: 520px){
       .bottom-left{ left:16px; bottom:16px; width:44vw; }
       .bottom-right{ right:16px; bottom:16px; width:44vw; }
       .center-actions{ padding:22px; }
     }
 
-    /* 오버레이/모달 */
+    /* 모달/패널 스타일 (기존 유지) */
     .overlay{
-      position:fixed;
-      inset:0;
-      display:none;
-      place-items:center;
-      background: rgba(28,18,12,.58);
-      padding:24px;
-      z-index:50;
+      position:fixed; inset:0; display:none; place-items:center;
+      background: rgba(28,18,12,.58); padding:24px; z-index:50;
     }
     .overlay.is-open{ display:grid; }
-
     .modal{
       width:min(980px, 96vw);
       background: linear-gradient(180deg, rgba(231,210,170,.98), rgba(216,189,138,.98));
-      border:2px solid rgba(66,44,26,.55);
-      border-radius: calc(var(--radius) + 12px);
-      box-shadow: var(--shadow);
-      padding:16px;
-      position:relative;
+      border:2px solid rgba(66,44,26,.55); border-radius: calc(var(--radius) + 12px);
+      box-shadow: var(--shadow); padding:16px; position:relative;
     }
-
-    /* 재료 세팅 UI 레이아웃 */
-    .setup-wrap{
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap:14px;
-      align-items:stretch;
-    }
-    @media (max-width: 900px){
-      .setup-wrap{ grid-template-columns: 1fr; }
-    }
-
+    .setup-wrap{ display:grid; grid-template-columns: 360px 1fr; gap:14px; align-items:stretch; }
+    @media (max-width: 900px){ .setup-wrap{ grid-template-columns: 1fr; } }
     .panel{
       background: linear-gradient(180deg, rgba(255,246,229,.96), rgba(232,206,160,.96));
-      border:2px solid rgba(66,44,26,.45);
-      border-radius: 18px;
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      min-height:520px;
-      min-width:0;
+      border:2px solid rgba(66,44,26,.45); border-radius: 18px; padding:12px;
+      display:flex; flex-direction:column; min-height:520px; min-width:0;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
     }
-    .panel-header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .panel-title{
-      font-weight:900;
-      letter-spacing:-0.02em;
-      font-size:15px;
-      margin:0;
-    }
-    .hint{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.3;
-      margin:0;
-    }
-
-    /* "레시피" 버튼 (우측 상단) */
-    .recipe-btn{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border-radius:999px;
-      border:2px solid rgba(66,44,26,.30);
-      background: rgba(255,255,255,.28);
-      padding:8px 12px;
-      font-weight:900;
-      font-size:13px;
-      cursor:pointer;
-      user-select:none;
-      box-shadow: 0 3px 0 rgba(66,44,26,.16);
-      color: var(--text);
-      white-space:nowrap;
-    }
-    .recipe-btn:active{
-      transform: translateY(1px);
-      box-shadow: 0 2px 0 rgba(66,44,26,.14);
-    }
-    .recipe-btn .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: rgba(47,143,78,.95);
-      border:1px solid rgba(31,111,59,.55);
-      box-shadow: 0 1px 0 rgba(255,255,255,.35) inset;
-    }
-
-    /* 좌측: 레시피 */
-    .bread-row{
-      display:flex;
-      gap:10px;
-      align-items:stretch;
-      margin-bottom:10px;
-    }
-    .bread-btn{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:12px 12px;
-      border-radius:14px;
-      border:2px solid rgba(66,44,26,.45);
-      background: linear-gradient(180deg, rgba(255,243,220,.95), rgba(232,206,160,.95));
-      cursor:pointer;
-      user-select:none;
-      font-weight:900;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
-    }
-    .chip{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:2px solid rgba(66,44,26,.35);
-      background: rgba(255,255,255,.35);
-      color:var(--muted);
-      white-space:nowrap;
-    }
-
+    .panel-header{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .panel-title{ font-weight:900; letter-spacing:-0.02em; font-size:15px; margin:0; }
+    .hint{ color:var(--muted); font-size:12px; line-height:1.3; margin:0; }
+    
+    /* 레시피 & 재료 UI 컴포넌트 (기존 유지) */
+    .recipe-btn{ display:inline-flex; align-items:center; gap:8px; border-radius:999px; border:2px solid rgba(66,44,26,.30); background: rgba(255,255,255,.28); padding:8px 12px; font-weight:900; font-size:13px; cursor:pointer; user-select:none; box-shadow: 0 3px 0 rgba(66,44,26,.16); color: var(--text); white-space:nowrap; }
+    .recipe-btn:active{ transform: translateY(1px); box-shadow: 0 2px 0 rgba(66,44,26,.14); }
+    .recipe-btn .dot{ width:10px;height:10px;border-radius:999px; background: rgba(47,143,78,.95); border:1px solid rgba(31,111,59,.55); box-shadow: 0 1px 0 rgba(255,255,255,.35) inset; }
+    .bread-row{ display:flex; gap:10px; align-items:stretch; margin-bottom:10px; }
+    .bread-btn{ flex:1; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 12px; border-radius:14px; border:2px solid rgba(66,44,26,.45); background: linear-gradient(180deg, rgba(255,243,220,.95), rgba(232,206,160,.95)); cursor:pointer; user-select:none; font-weight:900; box-shadow: inset 0 1px 0 rgba(255,255,255,.6); }
+    .chip{ font-size:12px; padding:6px 10px; border-radius:999px; border:2px solid rgba(66,44,26,.35); background: rgba(255,255,255,.35); color:var(--muted); white-space:nowrap; }
     .dropdown{ position:relative; flex:1; min-width:0; }
-    .dropdown-menu{
-      position:absolute;
-      left:0; right:0;
-      top:calc(100% + 8px);
-      background: linear-gradient(180deg, rgba(255,246,229,.98), rgba(232,206,160,.98));
-      border:2px solid rgba(66,44,26,.5);
-      border-radius:14px;
-      overflow:hidden;
-      box-shadow: var(--shadow);
-      display:none;
-      z-index:60;
-      max-height:240px;
-      overflow:auto;
-    }
+    .dropdown-menu{ position:absolute; left:0; right:0; top:calc(100% + 8px); background: linear-gradient(180deg, rgba(255,246,229,.98), rgba(232,206,160,.98)); border:2px solid rgba(66,44,26,.5); border-radius:14px; overflow:hidden; box-shadow: var(--shadow); display:none; z-index:60; max-height:240px; overflow:auto; }
     .dropdown.open .dropdown-menu{ display:block; }
-    .dd-item{
-      padding:10px 12px;
-      border-bottom:1px solid rgba(66,44,26,.18);
-      cursor:pointer;
-      font-weight:900;
-    }
-    .dd-item:last-child{ border-bottom:0; }
+    .dd-item{ padding:10px 12px; border-bottom:1px solid rgba(66,44,26,.18); cursor:pointer; font-weight:900; }
     .dd-item:hover{ background: rgba(255,255,255,.35); }
-
-    .recipe-box{
-      border:2px dashed rgba(66,44,26,.35);
-      border-radius:16px;
-      padding:10px;
-      flex:1;
-      min-height:320px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      min-width:0;
-      background: rgba(255,255,255,.20);
-    }
-    .recipe-slot{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:10px 10px;
-      border-radius:12px;
-      border:2px solid rgba(66,44,26,.25);
-      background: rgba(255,255,255,.35);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
-    }
-    .slot-left{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width:0;
-    }
-    .slot-idx{
-      width:22px;
-      height:22px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
-      font-size:12px;
-      font-weight:900;
-      color:#0e2416;
-      background: linear-gradient(180deg, rgba(74,195,108,.95), rgba(47,143,78,.95));
-      border:1px solid rgba(31,111,59,.55);
-      flex:0 0 auto;
-    }
-    .slot-name{
-      font-weight:900;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .slot-cat{
-      font-size:12px;
-      color:var(--muted);
-      white-space:nowrap;
-      flex:0 0 auto;
-    }
-    .slot-actions{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex:0 0 auto;
-    }
-    .mini-btn{
-      border:2px solid rgba(66,44,26,.30);
-      background: rgba(255,255,255,.35);
-      color:var(--text);
-      border-radius:10px;
-      padding:7px 10px;
-      font-size:12px;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow: 0 3px 0 rgba(66,44,26,.18);
-    }
+    .recipe-box{ border:2px dashed rgba(66,44,26,.35); border-radius:16px; padding:10px; flex:1; min-height:320px; display:flex; flex-direction:column; gap:8px; min-width:0; background: rgba(255,255,255,.20); }
+    .recipe-slot{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 10px; border-radius:12px; border:2px solid rgba(66,44,26,.25); background: rgba(255,255,255,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
+    .slot-left{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .slot-idx{ width:22px; height:22px; border-radius:999px; display:grid; place-items:center; font-size:12px; font-weight:900; color:#0e2416; background: linear-gradient(180deg, rgba(74,195,108,.95), rgba(47,143,78,.95)); border:1px solid rgba(31,111,59,.55); flex:0 0 auto; }
+    .slot-name{ font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .slot-cat{ font-size:12px; color:var(--muted); white-space:nowrap; flex:0 0 auto; }
+    .slot-actions{ display:flex; gap:8px; align-items:center; flex:0 0 auto; }
+    .mini-btn{ border:2px solid rgba(66,44,26,.30); background: rgba(255,255,255,.35); color:var(--text); border-radius:10px; padding:7px 10px; font-size:12px; font-weight:900; cursor:pointer; box-shadow: 0 3px 0 rgba(66,44,26,.18); }
     .mini-btn:active{ transform: translateY(1px); box-shadow: 0 2px 0 rgba(66,44,26,.16); }
-    .mini-btn.danger{
-      border-color: rgba(178,59,59,.45);
-      background: rgba(178,59,59,.18);
-      color:#3a1414;
-      box-shadow: 0 3px 0 rgba(178,59,59,.18);
-    }
-    .drop-hint{
-      margin-top:auto;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-
-    /* 우측: 분류 탭 + 재료 리스트 */
-    .tabs{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-bottom:10px;
-    }
-    .tab{
-      padding:8px 12px;
-      border-radius:999px;
-      border:2px solid rgba(66,44,26,.30);
-      background: rgba(255,255,255,.28);
-      cursor:pointer;
-      font-weight:900;
-      font-size:13px;
-      user-select:none;
-      box-shadow: 0 3px 0 rgba(66,44,26,.16);
-    }
+    .mini-btn.danger{ border-color: rgba(178,59,59,.45); background: rgba(178,59,59,.18); color:#3a1414; box-shadow: 0 3px 0 rgba(178,59,59,.18); }
+    .drop-hint{ margin-top:auto; color:var(--muted); font-size:12px; line-height:1.35; }
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .tab{ padding:8px 12px; border-radius:999px; border:2px solid rgba(66,44,26,.30); background: rgba(255,255,255,.28); cursor:pointer; font-weight:900; font-size:13px; user-select:none; box-shadow: 0 3px 0 rgba(66,44,26,.16); }
     .tab:active{ transform: translateY(1px); box-shadow: 0 2px 0 rgba(66,44,26,.14); }
-    .tab.active{
-      background: rgba(74,195,108,.22);
-      border-color: rgba(31,111,59,.45);
-      color:#0e2416;
-      box-shadow: 0 3px 0 rgba(31,111,59,.18);
-    }
-
-    .items{
-      border:2px solid rgba(66,44,26,.30);
-      border-radius:16px;
-      background: rgba(255,255,255,.18);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
-      flex:1;
-      min-height:0;
-    }
-    .items-scroll{
-      overflow:auto;
-      padding:10px;
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap:10px;
-    }
-    @media (max-width: 900px){
-      .items-scroll{ grid-template-columns: 1fr; }
-    }
-    .item{
-      border:2px solid rgba(66,44,26,.26);
-      background: rgba(255,255,255,.30);
-      border-radius:14px;
-      padding:10px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      cursor:grab;
-      user-select:none;
-      min-width:0;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
-    }
+    .tab.active{ background: rgba(74,195,108,.22); border-color: rgba(31,111,59,.45); color:#0e2416; box-shadow: 0 3px 0 rgba(31,111,59,.18); }
+    .items{ border:2px solid rgba(66,44,26,.30); border-radius:16px; background: rgba(255,255,255,.18); overflow:hidden; display:flex; flex-direction:column; flex:1; min-height:0; }
+    .items-scroll{ overflow:auto; padding:10px; display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; }
+    @media (max-width: 900px){ .items-scroll{ grid-template-columns: 1fr; } }
+    .item{ border:2px solid rgba(66,44,26,.26); background: rgba(255,255,255,.30); border-radius:14px; padding:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:grab; user-select:none; min-width:0; box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
     .item:active{ cursor:grabbing; }
-    .item.disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      filter:saturate(.75);
-    }
-    .item-left{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-    .item-name{
-      font-weight:900;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .item-sub{
-      font-size:12px;
-      color:var(--muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .count{
-      font-size:12px;
-      font-weight:900;
-      padding:6px 10px;
-      border-radius:999px;
-      border:2px solid rgba(66,44,26,.26);
-      background: rgba(255,255,255,.25);
-      flex:0 0 auto;
-      color:var(--muted);
-    }
-
-    /* 하단 버튼바 (프리셋 버튼 제거: 2개로 변경) */
-    .modal-footer{
-      margin-top:12px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    .btn-flat{
-      width:100%;
-      border-radius:16px;
-      padding:14px 16px;
-      font-size:15px;
-      font-weight:900;
-      border:2px solid rgba(66,44,26,.35);
-      background: rgba(255,255,255,.28);
-      color: var(--text);
-      cursor:pointer;
-      box-shadow: 0 4px 0 rgba(66,44,26,.18);
-    }
+    .item.disabled{ opacity:.55; cursor:not-allowed; filter:saturate(.75); }
+    .item-left{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+    .item-name{ font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .item-sub{ font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .count{ font-size:12px; font-weight:900; padding:6px 10px; border-radius:999px; border:2px solid rgba(66,44,26,.26); background: rgba(255,255,255,.25); flex:0 0 auto; color:var(--muted); }
+    .modal-footer{ margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .btn-flat{ width:100%; border-radius:16px; padding:14px 16px; font-size:15px; font-weight:900; border:2px solid rgba(66,44,26,.35); background: rgba(255,255,255,.28); color: var(--text); cursor:pointer; box-shadow: 0 4px 0 rgba(66,44,26,.18); }
     .btn-flat:active{ transform: translateY(1px); box-shadow: 0 3px 0 rgba(66,44,26,.16); }
-    .btn-flat.primary{
-      background: rgba(74,195,108,.22);
-      border-color: rgba(31,111,59,.45);
-      color:#0e2416;
-      box-shadow: 0 4px 0 rgba(31,111,59,.18);
-    }
-    .btn-flat.danger{
-      background: rgba(178,59,59,.18);
-      border-color: rgba(178,59,59,.42);
-      color:#3a1414;
-      box-shadow: 0 4px 0 rgba(178,59,59,.18);
-    }
+    .btn-flat.primary{ background: rgba(74,195,108,.22); border-color: rgba(31,111,59,.45); color:#0e2416; box-shadow: 0 4px 0 rgba(31,111,59,.18); }
+    .btn-flat.danger{ background: rgba(178,59,59,.18); border-color: rgba(178,59,59,.42); color:#3a1414; box-shadow: 0 4px 0 rgba(178,59,59,.18); }
+    .droppable{ outline: 3px solid rgba(74,195,108,.45); outline-offset: 2px; }
 
-    .droppable{
-      outline: 3px solid rgba(74,195,108,.45);
-      outline-offset: 2px;
-    }
-
-    /***********************
-     * 미리보기(기존 프리셋 기능)
-     ***********************/
-    .preview-overlay{
-      position:fixed;
-      inset:0;
-      display:none;
-      place-items:center;
-      background: rgba(28,18,12,.68);
-      padding:24px;
-      z-index:80;
-    }
+    /* 미리보기 팝업 (기존 유지) */
+    .preview-overlay{ position:fixed; inset:0; display:none; place-items:center; background: rgba(28,18,12,.68); padding:24px; z-index:80; }
     .preview-overlay.is-open{ display:grid; }
-
-    .preview-modal{
-      width:min(720px, 96vw);
-      border-radius: calc(var(--radius) + 12px);
-      border:2px solid rgba(66,44,26,.55);
-      background: linear-gradient(180deg, rgba(231,210,170,.98), rgba(216,189,138,.98));
-      box-shadow: var(--shadow);
-      padding:16px;
-    }
-    .preview-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .preview-title{
-      font-weight:900;
-      letter-spacing:-0.02em;
-      font-size:15px;
-      margin:0;
-    }
-    .preview-sub{
-      margin:0;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.3;
-    }
-    .preview-grid{
-      display:grid;
-      grid-template-columns: 1fr 260px;
-      gap:12px;
-      align-items:stretch;
-    }
-    @media (max-width: 720px){
-      .preview-grid{ grid-template-columns: 1fr; }
-    }
-    .burger-stage{
-      border:2px solid rgba(66,44,26,.30);
-      border-radius:18px;
-      background: rgba(255,255,255,.20);
-      padding:14px;
-      min-height:420px;
-      display:grid;
-      place-items:center;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
-    }
-    .burger{
-      width:min(360px, 90%);
-      display:flex;
-      flex-direction:column;
-      align-items:stretch;
-      gap:6px;
-      padding:10px;
-    }
-    .layer{
-      height:34px;
-      border-radius: 16px;
-      border:2px solid rgba(66,44,26,.20);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      font-size:12px;
-      letter-spacing:-0.01em;
-      user-select:none;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      padding:0 10px;
-      background: rgba(255,255,255,.28);
-    }
+    .preview-modal{ width:min(720px, 96vw); border-radius: calc(var(--radius) + 12px); border:2px solid rgba(66,44,26,.55); background: linear-gradient(180deg, rgba(231,210,170,.98), rgba(216,189,138,.98)); box-shadow: var(--shadow); padding:16px; }
+    .preview-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .preview-title{ font-weight:900; letter-spacing:-0.02em; font-size:15px; margin:0; }
+    .preview-sub{ margin:0; color:var(--muted); font-size:12px; line-height:1.3; }
+    .preview-grid{ display:grid; grid-template-columns: 1fr 260px; gap:12px; align-items:stretch; }
+    @media (max-width: 720px){ .preview-grid{ grid-template-columns: 1fr; } }
+    .burger-stage{ border:2px solid rgba(66,44,26,.30); border-radius:18px; background: rgba(255,255,255,.20); padding:14px; min-height:420px; display:grid; place-items:center; box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
+    .burger{ width:min(360px, 90%); display:flex; flex-direction:column; align-items:stretch; gap:6px; padding:10px; }
+    .layer{ height:34px; border-radius: 16px; border:2px solid rgba(66,44,26,.20); display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; letter-spacing:-0.01em; user-select:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 10px; background: rgba(255,255,255,.28); }
     .layer.bun-top{ height:46px; border-radius: 24px 24px 16px 16px; }
     .layer.bun-bot{ height:42px; border-radius: 16px 16px 24px 24px; }
-
     .layer.meat{ background: rgba(178,59,59,.18); }
     .layer.veg{ background: rgba(47,143,78,.18); }
     .layer.spice{ background: rgba(160,110,60,.18); }
     .layer.bread{ background: rgba(202,165,111,.35); }
-
-    .preview-side{
-      border:2px solid rgba(66,44,26,.30);
-      border-radius:18px;
-      background: rgba(255,255,255,.18);
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      min-height:420px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
-    }
-    .meta-box{
-      border:2px solid rgba(66,44,26,.20);
-      background: rgba(255,255,255,.25);
-      border-radius:14px;
-      padding:10px;
-    }
-    .meta-title{
-      font-weight:900;
-      font-size:12px;
-      margin:0 0 6px 0;
-      color: rgba(42,28,18,.95);
-    }
-    .meta-text{
-      margin:0;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.4;
-      white-space:pre-wrap;
-    }
-    .preview-actions{
-      margin-top:auto;
-      display:flex;
-      gap:10px;
-    }
+    .preview-side{ border:2px solid rgba(66,44,26,.30); border-radius:18px; background: rgba(255,255,255,.18); padding:12px; display:flex; flex-direction:column; gap:10px; min-height:420px; box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
+    .meta-box{ border:2px solid rgba(66,44,26,.20); background: rgba(255,255,255,.25); border-radius:14px; padding:10px; }
+    .meta-title{ font-weight:900; font-size:12px; margin:0 0 6px 0; color: rgba(42,28,18,.95); }
+    .meta-text{ margin:0; color:var(--muted); font-size:12px; line-height:1.4; white-space:pre-wrap; }
+    .preview-actions{ margin-top:auto; display:flex; gap:10px; }
     .preview-actions .btn-flat{ padding:12px 14px; }
+
+    /****************************************
+     * [신규] 게임 플레이 화면 스타일
+     ****************************************/
+    #gameScreen {
+      display: none; /* 초기에는 숨김 */
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, #4a3b2a, #2c1f16);
+    }
+    
+    /* 중앙 선 (카운터) */
+    .counter-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: #caa56f;
+      border-top: 2px solid rgba(255,255,255,0.3);
+      border-bottom: 2px solid rgba(0,0,0,0.3);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      z-index: 5;
+    }
+
+    /* 플레이어 (사람 아이콘) */
+    .player {
+      position: absolute;
+      top: calc(50% - 130px); /* 선 바로 위 */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      font-size: 80px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+      z-index: 10;
+    }
+
+    /* 손님 컨테이너 */
+    .customer-container {
+      position: absolute;
+      left: 50%;
+      width: 100px;
+      height: 120px;
+      transform: translateX(-50%);
+      bottom: -150px; /* 화면 밖에서 시작 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: bottom 3s linear; /* 3초 동안 이동 */
+      z-index: 20;
+    }
+
+    .customer-icon {
+      font-size: 80px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    }
+
+    /* 말풍선 */
+    .speech-bubble {
+      position: absolute;
+      left: 80px; /* 손님 우측 */
+      top: -20px;
+      background: #fff;
+      border: 3px solid #2a1c12;
+      border-radius: 20px;
+      border-bottom-left-radius: 0;
+      padding: 15px;
+      min-width: 60px;
+      min-height: 60px;
+      display: none; /* 기본 숨김 */
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .speech-bubble:active {
+      transform: scale(0.95);
+    }
+    .bubble-content {
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* [탭 키] 주문 목록 팝업 (Top UI) */
+    #orderPopup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-150%); /* 위로 숨김 */
+      width: min(800px, 90vw);
+      background: linear-gradient(180deg, rgba(255,246,229,.98), rgba(232,206,160,.98));
+      border: 3px solid #422c1a;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #orderPopup.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .order-table {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 5px;
+      width: 100%;
+    }
+    .order-slot {
+      aspect-ratio: 1/1;
+      background: rgba(255,255,255,0.4);
+      border: 2px solid rgba(66,44,26,0.3);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .slot-num {
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+    .slot-icon {
+      font-size: 24px;
+    }
+
   </style>
 </head>
 <body>
-  <!-- 홈 화면 -->
   <main class="screen" id="home">
     <section class="center-actions" aria-label="홈 메뉴">
       <h1 class="title">가게 운영</h1>
@@ -656,7 +349,21 @@
     </div>
   </main>
 
-  <!-- 가게 운영 시작(재료 세팅) 팝업 -->
+  <div id="gameScreen">
+    <div id="orderPopup">
+      <div class="order-table" id="orderTable">
+        </div>
+    </div>
+
+    <div class="player">
+      <span role="img" aria-label="플레이어">🧑‍🍳</span>
+    </div>
+
+    <div class="counter-line"></div>
+
+    <div id="customerLayer"></div>
+  </div>
+
   <div class="overlay" id="opStartOverlay" role="dialog" aria-modal="true" aria-labelledby="opStartTitle">
     <div class="modal">
       <div class="panel-header" style="margin-bottom:12px;">
@@ -668,7 +375,6 @@
       </div>
 
       <div class="setup-wrap" id="setupView">
-        <!-- 좌측: 레시피 -->
         <section class="panel" aria-label="레시피">
           <div class="panel-header">
             <h3 class="panel-title">레시피</h3>
@@ -693,15 +399,12 @@
           </p>
         </section>
 
-        <!-- 우측: 재료 (우측 상단에 레시피 버튼 배치) -->
         <section class="panel" aria-label="재료 목록">
           <div class="panel-header">
             <div>
               <h3 class="panel-title">재료</h3>
               <p class="hint">보유 수량이 0개인 재료는 비활성 처리됩니다.</p>
             </div>
-
-            <!-- 레시피 버튼: 프리셋 기능(미리보기)으로 연결 -->
             <button class="recipe-btn" id="btnRecipePreview" type="button" aria-label="레시피 미리보기">
               <span class="dot" aria-hidden="true"></span>
               레시피
@@ -720,7 +423,6 @@
         </section>
       </div>
 
-      <!-- 하단 버튼: 프리셋 제거 -->
       <div class="modal-footer" aria-label="하단 버튼">
         <button class="btn-flat primary" id="btnPlay">시작</button>
         <button class="btn-flat danger" id="btnExit">나가기</button>
@@ -728,7 +430,6 @@
     </div>
   </div>
 
-  <!-- 미리보기(기존 프리셋 기능) 팝업 -->
   <div class="preview-overlay" id="previewOverlay" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
     <div class="preview-modal">
       <div class="preview-head">
@@ -738,12 +439,10 @@
         </div>
         <div class="chip" id="previewCountChip">0 / 10</div>
       </div>
-
       <div class="preview-grid">
         <div class="burger-stage" aria-label="햄버거 이미지 영역">
           <div class="burger" id="burgerView"></div>
         </div>
-
         <aside class="preview-side" aria-label="미리보기 정보">
           <div class="meta-box">
             <p class="meta-title">선택 빵</p>
@@ -757,7 +456,6 @@
             <p class="meta-title">목적</p>
             <p class="meta-text">영업 중 판매될 햄버거가 어떻게 보이는지 시각적으로 확인</p>
           </div>
-
           <div class="preview-actions">
             <button class="btn-flat danger" id="btnPreviewExit">나가기</button>
           </div>
@@ -767,15 +465,16 @@
   </div>
 
   <script>
+    /* ===============================
+     * 기존 데이터 & 변수
+     * =============================== */
     const BREADS = ["밀 빵","브리오슈","치아바타","베이글","머핀"];
-
     const INGREDIENTS = [
       { name:"콩고기", cat:"고기", infinite:true },
       { name:"돼지고기", cat:"고기" },
       { name:"소고기", cat:"고기" },
       { name:"닭고기", cat:"고기" },
       { name:"물고기", cat:"고기" },
-
       { name:"토마토", cat:"채소" },
       { name:"양상추", cat:"채소" },
       { name:"감자", cat:"채소" },
@@ -789,7 +488,6 @@
       { name:"아티초크", cat:"채소" },
       { name:"블루베리", cat:"채소" },
       { name:"호박", cat:"채소" },
-
       { name:"마늘", cat:"향신료" },
       { name:"고추", cat:"향신료" },
       { name:"깻잎", cat:"향신료" },
@@ -799,36 +497,12 @@
       { name:"샬롯", cat:"향신료" },
       { name:"캐모마일", cat:"향신료" },
     ];
-
     const STOCK = {
-      "콩고기": Infinity,
-      "돼지고기": 3,
-      "소고기": 2,
-      "닭고기": 0,
-      "물고기": 1,
-
-      "토마토": 5,
-      "양상추": 0,
-      "감자": 4,
-      "당근": 2,
-      "상추": 1,
-      "파프리카": 0,
-      "가지": 2,
-      "브로콜리": 1,
-      "콜리플라워": 0,
-      "청경채": 1,
-      "아티초크": 0,
-      "블루베리": 2,
-      "호박": 3,
-
-      "마늘": 6,
-      "고추": 2,
-      "깻잎": 1,
-      "로즈마리": 0,
-      "바질": 2,
-      "박하": 0,
-      "샬롯": 1,
-      "캐모마일": 0,
+      "콩고기": Infinity, "돼지고기": 3, "소고기": 2, "닭고기": 0, "물고기": 1,
+      "토마토": 5, "양상추": 0, "감자": 4, "당근": 2, "상추": 1, "파프리카": 0,
+      "가지": 2, "브로콜리": 1, "콜리플라워": 0, "청경채": 1, "아티초크": 0,
+      "블루베리": 2, "호박": 3, "마늘": 6, "고추": 2, "깻잎": 1, "로즈마리": 0,
+      "바질": 2, "박하": 0, "샬롯": 1, "캐모마일": 0,
     };
 
     const MAX_RECIPE = 10;
@@ -836,34 +510,85 @@
     let currentTab = "고기";
     let recipeItems = [];
 
+    // 기존 UI 요소들
     const btnStart = document.getElementById('btnStart');
     const overlay = document.getElementById('opStartOverlay');
-
     const recipeDropZone = document.getElementById('recipeDropZone');
     const recipeCountChip = document.getElementById('recipeCountChip');
-
     const selectedBreadChip = document.getElementById('selectedBreadChip');
     const breadDropdown = document.getElementById('breadDropdown');
     const breadBtn = document.getElementById('breadBtn');
     const breadBtnValue = document.getElementById('breadBtnValue');
     const breadMenu = document.getElementById('breadMenu');
-
     const tabs = document.getElementById('tabs');
     const itemsGrid = document.getElementById('itemsGrid');
-
     const btnPlay = document.getElementById('btnPlay');
     const btnExit = document.getElementById('btnExit');
-
-    // 새로 추가: 우측 상단 "레시피" 버튼(미리보기)
     const btnRecipePreview = document.getElementById('btnRecipePreview');
-
     const previewOverlay = document.getElementById('previewOverlay');
     const btnPreviewExit = document.getElementById('btnPreviewExit');
     const burgerView = document.getElementById('burgerView');
     const previewBreadText = document.getElementById('previewBreadText');
     const previewItemsText = document.getElementById('previewItemsText');
     const previewCountChip = document.getElementById('previewCountChip');
+    const homeScreen = document.getElementById('home');
 
+    /* ===============================
+     * [신규] 게임 로직용 변수
+     * =============================== */
+    const gameScreen = document.getElementById('gameScreen');
+    const customerLayer = document.getElementById('customerLayer');
+    const orderPopup = document.getElementById('orderPopup');
+    const orderTable = document.getElementById('orderTable');
+    
+    // 현재 접수된 주문 목록 (최대 9개)
+    let activeOrders = []; 
+    // 게임 진행 중 여부
+    let isGameRunning = false; 
+
+    // 초기화: 주문 팝업의 1~9 슬롯 미리 생성
+    function initOrderSlots() {
+      orderTable.innerHTML = "";
+      for(let i=1; i<=9; i++){
+        const slot = document.createElement("div");
+        slot.className = "order-slot";
+        slot.innerHTML = `<span class="slot-num">${i}</span><span class="slot-icon" id="slotIcon_${i}"></span>`;
+        orderTable.appendChild(slot);
+      }
+    }
+    initOrderSlots();
+
+    // 팝업 렌더링 (주문 목록 반영)
+    function renderOrderPopup() {
+      for(let i=1; i<=9; i++) {
+        const iconEl = document.getElementById(`slotIcon_${i}`);
+        // 배열 인덱스는 0부터 시작하므로 i-1
+        if (activeOrders[i-1]) {
+          iconEl.textContent = "🍔"; // 주문이 있으면 햄버거 표시
+        } else {
+          iconEl.textContent = "";
+        }
+      }
+    }
+
+    // 탭 키 이벤트: 주문 팝업 토글
+    window.addEventListener("keydown", (e) => {
+      // 게임 중일 때만 작동
+      if (isGameRunning && e.key === "Tab") {
+        e.preventDefault(); // 기본 탭 이동 방지
+        orderPopup.classList.toggle("visible");
+      }
+      
+      // ESC 키 (기존 로직 유지 + 게임 중일 때는 무시하거나 필요시 추가)
+      if (e.key === "Escape"){
+        if (isPreviewOpen()) closePreview();
+        else if (overlay.classList.contains("is-open")) closeOverlay();
+      }
+    });
+
+    /* ===============================
+     * 기존 함수들 (UI 제어)
+     * =============================== */
     function openOverlay(){
       overlay.classList.add('is-open');
       breadDropdown.classList.remove('open');
@@ -875,7 +600,6 @@
       closePreview();
       recipeDropZone.classList.remove('droppable');
     }
-
     function openPreview(){
       previewOverlay.classList.add('is-open');
       renderPreview();
@@ -886,14 +610,12 @@
     function isPreviewOpen(){
       return previewOverlay.classList.contains('is-open');
     }
-
     function setBread(bread){
       selectedBread = bread;
       selectedBreadChip.textContent = `빵: ${selectedBread}`;
       breadBtnValue.textContent = selectedBread;
       if (isPreviewOpen()) renderPreview();
     }
-
     function getCountLabel(name){
       const v = STOCK[name];
       if (v === Infinity) return "∞";
@@ -912,7 +634,7 @@
       BREADS.forEach(b => {
         const div = document.createElement("div");
         div.className = "dd-item";
-        const label = (b === "밀 빵") ? `${b}  (∞)` : b;
+        const label = (b === "밀 빵") ? `${b} (∞)` : b;
         div.textContent = label;
         div.addEventListener("click", () => {
           setBread(b);
@@ -925,54 +647,48 @@
     function renderItems(){
       itemsGrid.innerHTML = "";
       const list = INGREDIENTS.filter(x => x.cat === currentTab);
-
       list.forEach(x => {
         const card = document.createElement("div");
         const available = isAvailable(x.name);
-
         card.className = "item" + (available ? "" : " disabled");
         card.setAttribute("draggable", available ? "true" : "false");
         card.dataset.name = x.name;
         card.dataset.cat = x.cat;
-
+        
         const left = document.createElement("div");
         left.className = "item-left";
-
+        
         const name = document.createElement("div");
         name.className = "item-name";
         name.textContent = x.name;
-
+        
         const sub = document.createElement("div");
         sub.className = "item-sub";
         sub.textContent = `${x.cat} · 보유 ${getCountLabel(x.name)}`;
-
+        
         left.appendChild(name);
         left.appendChild(sub);
-
+        
         const count = document.createElement("div");
         count.className = "count";
         count.textContent = getCountLabel(x.name);
-
+        
         card.appendChild(left);
         card.appendChild(count);
-
+        
         if (available){
           card.addEventListener("dragstart", (e) => {
             e.dataTransfer.setData("text/plain", JSON.stringify({
-              type: "add",
-              name: x.name,
-              cat: x.cat
+              type: "add", name: x.name, cat: x.cat
             }));
           });
         }
-
         itemsGrid.appendChild(card);
       });
     }
 
     function renderRecipe(){
       recipeDropZone.innerHTML = "";
-
       if (recipeItems.length === 0){
         const empty = document.createElement("div");
         empty.className = "hint";
@@ -980,33 +696,25 @@
         empty.textContent = "레시피 재료가 비어있습니다. 우측 재료를 드래그해서 넣어주세요.";
         recipeDropZone.appendChild(empty);
       }
-
       recipeItems.forEach((it, idx) => {
         const row = document.createElement("div");
         row.className = "recipe-slot";
-
         const left = document.createElement("div");
         left.className = "slot-left";
-
         const badge = document.createElement("div");
         badge.className = "slot-idx";
         badge.textContent = String(idx + 1);
-
         const name = document.createElement("div");
         name.className = "slot-name";
         name.textContent = it.name;
-
         const cat = document.createElement("div");
         cat.className = "slot-cat";
         cat.textContent = it.cat;
-
         left.appendChild(badge);
         left.appendChild(name);
         left.appendChild(cat);
-
         const actions = document.createElement("div");
         actions.className = "slot-actions";
-
         const removeBtn = document.createElement("button");
         removeBtn.className = "mini-btn danger";
         removeBtn.textContent = "제거";
@@ -1016,15 +724,11 @@
           renderRecipe();
           if (isPreviewOpen()) renderPreview();
         });
-
         actions.appendChild(removeBtn);
-
         row.appendChild(left);
         row.appendChild(actions);
-
         recipeDropZone.appendChild(row);
       });
-
       updateRecipeCount();
     }
 
@@ -1039,16 +743,13 @@
       recipeDropZone.addEventListener("drop", (e) => {
         e.preventDefault();
         recipeDropZone.classList.remove("droppable");
-
         let payload;
         try { payload = JSON.parse(e.dataTransfer.getData("text/plain")); }
         catch { return; }
         if (!payload) return;
-
         if (payload.type === "add"){
           if (recipeItems.length >= MAX_RECIPE) return;
           if (!isAvailable(payload.name)) return;
-
           recipeItems.push({ name: payload.name, cat: payload.cat });
           updateRecipeCount();
           renderRecipe();
@@ -1062,7 +763,6 @@
         const t = e.target.closest(".tab");
         if (!t) return;
         currentTab = t.dataset.cat;
-
         [...tabs.querySelectorAll(".tab")].forEach(x => x.classList.remove("active"));
         t.classList.add("active");
         renderItems();
@@ -1079,18 +779,14 @@
     function renderPreview(){
       previewBreadText.textContent = (selectedBread === "밀 빵") ? `${selectedBread} (∞)` : selectedBread;
       previewCountChip.textContent = `${recipeItems.length} / ${MAX_RECIPE}`;
-      previewItemsText.textContent =
-        recipeItems.length
-          ? recipeItems.map((x,i)=>`${i+1}. ${x.name} (${x.cat})`).join("\n")
-          : "재료 없음";
-
+      previewItemsText.textContent = recipeItems.length
+        ? recipeItems.map((x,i)=>`${i+1}. ${x.name} (${x.cat})`).join("\n")
+        : "재료 없음";
       burgerView.innerHTML = "";
-
       const topBun = document.createElement("div");
       topBun.className = "layer bun-top bread";
       topBun.textContent = `${selectedBread} (상단)`;
       burgerView.appendChild(topBun);
-
       if (recipeItems.length === 0){
         const empty = document.createElement("div");
         empty.className = "layer";
@@ -1104,27 +800,109 @@
           burgerView.appendChild(layer);
         });
       }
-
       const botBun = document.createElement("div");
       botBun.className = "layer bun-bot bread";
       botBun.textContent = `${selectedBread} (하단)`;
       burgerView.appendChild(botBun);
     }
 
+    /* ===============================
+     * [신규] 게임 실행 로직
+     * =============================== */
+    
+    // 시작 버튼 클릭 (오버레이 닫고 게임 화면 진입)
     btnPlay.addEventListener("click", () => {
-      const summary =
-        `빵: ${selectedBread}\n` +
-        `재료(${recipeItems.length}/${MAX_RECIPE}): ` +
-        (recipeItems.length ? recipeItems.map(x=>x.name).join(", ") : "없음");
-      alert("가게 운영 시작!\n\n" + summary);
+      // 오버레이 닫기
+      overlay.classList.remove('is-open');
+      
+      // 홈 화면 숨기기
+      homeScreen.classList.add('hidden');
+      
+      // 게임 화면 보이기
+      gameScreen.style.display = "block";
+      
+      // 게임 상태 시작
+      startGame();
     });
 
-    // 변경 핵심: "레시피" 버튼 -> 미리보기 오픈
-    btnRecipePreview.addEventListener("click", () => openPreview());
+    function startGame() {
+      isGameRunning = true;
+      activeOrders = []; // 주문 초기화
+      renderOrderPopup();
 
+      // 손님 스폰 (약간의 딜레이 후 등장)
+      setTimeout(() => {
+        spawnCustomer();
+      }, 500);
+    }
+
+    function spawnCustomer() {
+      // 1. 컨테이너 생성
+      const container = document.createElement('div');
+      container.className = 'customer-container';
+      
+      // 2. 손님 아이콘
+      const icon = document.createElement('div');
+      icon.className = 'customer-icon';
+      icon.textContent = '🚶'; // 걷는 사람 이모지
+      
+      // 3. 말풍선 (숨김 상태)
+      const bubble = document.createElement('div');
+      bubble.className = 'speech-bubble';
+      bubble.innerHTML = '<div class="bubble-content">...</div>'; // 처음엔 점
+      
+      // 4. 조립
+      container.appendChild(icon);
+      container.appendChild(bubble);
+      customerLayer.appendChild(container);
+      
+      // 5. 이동 (DOM 렌더링 후 스타일 변경으로 애니메이션 트리거)
+      // requestAnimationFrame을 두 번 호출하여 확실한 리플로우 유도
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          // 중앙 선 근처로 이동 (bottom 50% - 약간의 조정)
+          container.style.bottom = 'calc(50% - 130px)';
+        });
+      });
+
+      // 6. 도착 이벤트 (CSS transition 완료 시점)
+      container.addEventListener('transitionend', () => {
+        // 말풍선 보이기
+        bubble.style.display = 'flex';
+        // 클릭 이벤트 등록
+        bubble.onclick = (e) => {
+          e.stopPropagation(); // 버블 클릭 시 이벤트 전파 방지
+          handleBubbleClick(bubble);
+        };
+      }, { once: true }); // 한 번만 실행
+    }
+
+    function handleBubbleClick(bubbleEl) {
+      const contentEl = bubbleEl.querySelector('.bubble-content');
+      
+      // 이미 클릭된 상태(햄버거)라면 무시 (중복 추가 방지)
+      if (contentEl.textContent === '🍔') return;
+
+      // 1. 말풍선 내용 변경 -> 햄버거
+      contentEl.textContent = '🍔';
+
+      // 2. 주문 목록(표)에 추가 (최대 9개)
+      if (activeOrders.length < 9) {
+        activeOrders.push({ item: 'burger' });
+        renderOrderPopup(); // UI 갱신 (탭키 누르면 확인 가능)
+      } else {
+        alert("주문이 꽉 찼습니다!");
+      }
+    }
+
+
+    /* ===============================
+     * 기본 초기화
+     * =============================== */
+    btnRecipePreview.addEventListener("click", () => openPreview());
     btnPreviewExit.addEventListener("click", () => closePreview());
     btnExit.addEventListener("click", () => closeOverlay());
-
+    
     breadBtn.addEventListener("click", () => {
       breadDropdown.classList.toggle("open");
     });
@@ -1133,22 +911,8 @@
     });
 
     btnStart.addEventListener('click', openOverlay);
-
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) closeOverlay();
-    });
-
-    previewOverlay.addEventListener("click", (e) => {
-      if (e.target === previewOverlay) {
-        // 바깥 클릭 닫기 비활성(나가기 버튼으로만)
-      }
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape"){
-        if (isPreviewOpen()) closePreview();
-        else if (overlay.classList.contains("is-open")) closeOverlay();
-      }
     });
 
     function setBreadInit(bread){
@@ -1156,14 +920,12 @@
       selectedBreadChip.textContent = `빵: ${selectedBread}`;
       breadBtnValue.textContent = selectedBread;
     }
-
     function renderAll(){
       renderBreadMenu();
       renderItems();
       renderRecipe();
       if (isPreviewOpen()) renderPreview();
     }
-
     function init(){
       setBreadInit("밀 빵");
       wireDropZone();
@@ -1171,6 +933,7 @@
       renderAll();
     }
     init();
+
   </script>
 </body>
 </html>
